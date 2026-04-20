@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import url("https://googleapis.com");
+
+@theme {
+  --color-primary: #3e405d;
+  --color-secondary: #f17358;
+  --font-kulim: "Kulim Park", sans-serif;
+}
