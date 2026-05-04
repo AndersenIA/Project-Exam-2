@@ -2,26 +2,30 @@ import { mockVenues, mockProfile } from "../data/mockData";
 
 export function Home() {
   return (
-    <main className="flex flex-col mt-30 font-kulim font-thin">
+    <main className="flex flex-col mt-20 font-kulim font-thin">
       <section
-        className="bg-cover bg-center min-h-80 flex items-end border-b-2 border-primary"
+        className="bg-cover bg-center min-h-80 md:min-h-150 flex items-end border-b-2 border-primary mb-10"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1566371486490-560ded23b5e4?fm=jpg&q=60&w=3000&auto=format&fit=crop')",
+            "url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
         }}
       >
-        <div className="w-full px-8 pb-8 bg-linear-to-t from-black/60 to-transparent pt-20">
-          <div className="max-w-100">
-            <h1 className="text-3xl text-white drop-shadow-lg">Welcome {mockProfile.username}!</h1>
-            <h2 className="text-lg text-white drop-shadow-md mt-1">
+        <div className="w-full px-8 pb-8 md:pb-18 bg-linear-to-t from-black/80 to-transparent pt-5">
+          <div className="max-w-150">
+            <h1 className="text-4xl md:text-5xl text-white drop-shadow-lg pb-4">
+              Welcome {mockProfile.username}!
+            </h1>
+            <h2 className="text-2xl md:text-3xl text-white drop-shadow-md mt-1 ">
               Plan your next vacation
               <br /> View the{" "}
-              <a className="text-secondary" href="/venues">
+              <a className="text-secondary md:text-5xl" href="/venues">
                 venues
               </a>
             </h2>
             <div className="pt-4">
-              <p className="text-white drop-shadow-md">Where do you want to travel to?</p>
+              <p className="text-white drop-shadow-md md:text-xl">
+                Where do you want to travel to?
+              </p>
               <div className="flex items-center pt-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -48,9 +52,11 @@ export function Home() {
         </div>
       </section>
 
-      <section className="py-8">
-        <h2 className="text-2xl text-center mb-6">Popular venues</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <section className="p-8 pb-50 flex flex-col gap-6">
+        <h2 className="text-2xl text-center mb-6 text-primary">
+          Popular venues
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-primary">
           {mockVenues.map((venue) => (
             <a
               key={venue.id}
@@ -60,12 +66,12 @@ export function Home() {
               <img
                 src={venue.image}
                 alt={venue.name}
-                className="w-full h-40 object-cover"
+                className="w-full h-20 md:h-40 object-cover"
               />
               <div className="flex justify-between items-center px-3 py-2">
                 <div>
-                  <p className="font-normal">{venue.name}</p>
-                  <p className="text-sm">${venue.price}/night</p>
+                  <p className="font-normal text-sm">{venue.name}</p>
+                  <p className="text-sm font-thin">${venue.price}/night</p>
                 </div>
                 <div className="flex items-center gap-1 text-secondary">
                   <svg
@@ -82,6 +88,9 @@ export function Home() {
             </a>
           ))}
         </div>
+        <button className="border border-secondary rounded-lg mt-4 w-fit mx-auto px-4 py-2 text-secondary hover:bg-secondary hover:text-white transition-colors cursor-pointer">
+          View all venues
+        </button>
       </section>
     </main>
   );

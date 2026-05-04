@@ -15,7 +15,7 @@ export function HamburgerMenu() {
   }, []);
 
   return (
-    <div className="" ref={menuRef}>
+    <div className="font-kulim" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex flex-col justify-center items-center w-8 h-8 space-y-1.5"
@@ -33,7 +33,7 @@ export function HamburgerMenu() {
       </button>
 
       {isOpen && (
-        <ul className="absolute top-full mt-0.5 right-0 w-48 text-primary border-l-2 border-b-2 border-secondary rounded-bl-2xl shadow-lg flex flex-col justify-between min-h-70 py-2 bg-white">
+        <ul className="absolute top-full mt-0.5 right-0 w-48 text-primary border-l-2 border-b-2 border-secondary rounded-bl-2xl shadow-lg flex flex-col justify-between min-h-70 py-2 bg-white ">
           <div className="flex flex-col">
             <li>
               <a

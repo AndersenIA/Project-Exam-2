@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function RegisterPage() {
   return (
-    <main className="px-8 h-screen flex flex-col pt-15 font-kulim">
+    <main className="px-8 h-screen flex flex-col pt-15 font-kulim md:max-w-100 mx-auto">
       <img className="w-19 pb-10" src={logo} alt="" />
       <h1 className="text-2xl font-thin text-primary pb-10">
         Create your account
