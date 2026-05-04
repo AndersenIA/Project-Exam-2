@@ -1,20 +1,12 @@
+import logo_img from "../assets/holidazeLogo.png";
+import { HamburgerMenu } from "./HamburgerMenu";
+
 export function Navbar() {
   return (
-    <nav className="bg-gray-800 text-white py-4">
+    <nav className="fixed bg-white w-screen text-white py-4 px-8 border-b-2 border-primary font-kulim">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-xl font-bold">My React App</h1>
-        <ul className="flex space-x-4">
-          <li>
-            <a href="/" className="hover:text-gray-400">
-              Home
-            </a>
-          </li>
-          <li>
-            <a href="/register" className="hover:text-gray-400">
-              Register
-            </a>
-          </li>
-        </ul>
+        <img className="w-16" src={logo_img} alt="Holidaze Logo" />
+        <HamburgerMenu />
       </div>
     </nav>
   );
