@@ -1,8 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsOpen(false);
+    if (search.trim()) navigate(`/venues?search=${encodeURIComponent(search.trim())}`);
+    else navigate("/venues");
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -18,7 +28,7 @@ export function HamburgerMenu() {
     <div className="font-kulim" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex flex-col justify-center items-center w-8 h-8 space-y-1.5"
+        className="flex flex-col justify-center items-center w-8 h-8 space-y-1.5 cursor-pointer"
         aria-label="Toggle menu"
       >
         <span
@@ -62,27 +72,30 @@ export function HamburgerMenu() {
                 Your bookings
               </a>
             </li>
-            <li className="px-4 py-2 flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-4 text-secondary"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            <li className="px-4 py-2">
+              <form onSubmit={handleSearch} className="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-4 text-secondary shrink-0"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                  />
+                </svg>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full border-b border-secondary px-2 py-1 text-sm bg-transparent placeholder-primary/55 focus:outline-none placeholder:font-extralight placeholder:italic"
                 />
-              </svg>
-
-              <input
-                type="search"
-                placeholder="Search..."
-                className="w-full border-b border-secondary px-2 py-1 text-sm bg-transparent placeholder-primary/55 focus:outline-none placeholder:font-extralight placeholder:italic"
-              />
+              </form>
             </li>
           </div>
           <li>

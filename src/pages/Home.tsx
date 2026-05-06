@@ -1,6 +1,17 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { mockVenues, mockProfile } from "../data/mockData";
 
 export function Home() {
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+
+  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (search.trim()) navigate(`/venues?search=${encodeURIComponent(search.trim())}`);
+    else navigate("/venues");
+  }
+
   return (
     <main className="flex flex-col mt-20 font-kulim font-thin">
       <section
@@ -26,7 +37,7 @@ export function Home() {
               <p className="text-white drop-shadow-md md:text-xl">
                 Where do you want to travel to?
               </p>
-              <div className="flex items-center pt-4">
+              <form onSubmit={handleSearch} className="flex items-center pt-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -43,10 +54,12 @@ export function Home() {
                 </svg>
                 <input
                   type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search..."
                   className="w-full border-b border-white px-2 py-1 text-sm bg-transparent text-white placeholder-white/70 max-w-70 focus:outline-none placeholder:font-extralight placeholder:italic"
                 />
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -57,7 +70,7 @@ export function Home() {
           Popular venues
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-primary">
-          {mockVenues.map((venue) => (
+          {[...mockVenues].sort((a, b) => b.rating - a.rating).slice(0, 4).map((venue) => (
             <a
               key={venue.id}
               href={`/venues/${venue.id}`}
@@ -88,9 +101,9 @@ export function Home() {
             </a>
           ))}
         </div>
-        <button className="border border-secondary rounded-lg mt-4 w-fit mx-auto px-4 py-2 text-secondary hover:bg-secondary hover:text-white transition-colors cursor-pointer">
+        <Link to="/venues" className="border border-secondary rounded-lg mt-4 w-fit mx-auto px-4 py-2 text-secondary hover:bg-secondary hover:text-white transition-colors">
           View all venues
-        </button>
+        </Link>
       </section>
     </main>
   );
