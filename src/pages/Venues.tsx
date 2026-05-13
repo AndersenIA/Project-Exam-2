@@ -1,24 +1,18 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { mockVenues } from "../data/mockData";
+import { getVenues, searchVenues, type Venue, type VenueMeta } from "../api/venues";
 
 type SortOption = "recommended" | "price-asc" | "price-desc" | "rating";
+type AmenityKey = keyof VenueMeta;
 
-const ALL_AMENITIES = [
-  "Free WiFi",
-  "Private pool",
-  "Beach access",
-  "Pet friendly",
-  "Kitchen",
-  "BBQ area",
-  "Fireplace",
-  "Hot tub",
-  "Sauna",
-  "Air conditioning",
-  "Parking",
+const ALL_AMENITIES: { key: AmenityKey; label: string }[] = [
+  { key: "wifi", label: "Free WiFi" },
+  { key: "parking", label: "Parking" },
+  { key: "breakfast", label: "Breakfast" },
+  { key: "pets", label: "Pet friendly" },
 ];
 
-const MAX_PRICE = Math.max(...mockVenues.map((v) => v.price));
+const MAX_PRICE = 10000;
 
 export function Venues() {
   const [searchParams] = useSearchParams();
@@ -26,32 +20,52 @@ export function Venues() {
   const [sort, setSort] = useState<SortOption>("recommended");
   const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
   const [minRating, setMinRating] = useState(0);
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<AmenityKey[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  function toggleAmenity(amenity: string) {
+  const [venues, setVenues] = useState<Venue[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = search.trim()
+          ? await searchVenues(search.trim())
+          : await getVenues();
+        if (!cancelled) setVenues(data);
+      } catch {
+        if (!cancelled) setError("Could not load venues. Please try again.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    const debounce = setTimeout(load, search ? 400 : 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(debounce);
+    };
+  }, [search]);
+
+  function toggleAmenity(key: AmenityKey) {
     setSelectedAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity],
+      prev.includes(key) ? prev.filter((a) => a !== key) : [...prev, key],
     );
   }
 
   const filtered = useMemo(() => {
-    let results = mockVenues.filter((venue) => {
-      const matchesSearch = venue.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
+    let results = venues.filter((venue) => {
       const matchesPrice = venue.price <= maxPrice;
       const matchesRating = venue.rating >= minRating;
       const matchesAmenities =
         selectedAmenities.length === 0 ||
-        selectedAmenities.every((a) =>
-          venue.amenities.some((va) =>
-            va.toLowerCase().includes(a.toLowerCase()),
-          ),
-        );
-      return matchesSearch && matchesPrice && matchesRating && matchesAmenities;
+        selectedAmenities.every((key) => venue.meta[key]);
+      return matchesPrice && matchesRating && matchesAmenities;
     });
 
     if (sort === "price-asc")
@@ -62,7 +76,7 @@ export function Venues() {
       results = [...results].sort((a, b) => b.rating - a.rating);
 
     return results;
-  }, [search, sort, maxPrice, minRating, selectedAmenities]);
+  }, [venues, sort, maxPrice, minRating, selectedAmenities]);
 
   const activeFilterCount =
     (maxPrice < MAX_PRICE ? 1 : 0) +
@@ -193,21 +207,21 @@ export function Venues() {
                   Max price per night
                 </label>
                 <span className="text-sm text-secondary font-normal">
-                  ${maxPrice}
+                  ${maxPrice === MAX_PRICE ? "Any" : maxPrice}
                 </span>
               </div>
               <input
                 type="range"
-                min={100}
+                min={0}
                 max={MAX_PRICE}
-                step={10}
+                step={50}
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className="w-full accent-secondary cursor-pointer"
               />
               <div className="flex justify-between text-xs text-primary/40 mt-1">
-                <span>$100</span>
-                <span>${MAX_PRICE}</span>
+                <span>$0</span>
+                <span>$10 000+</span>
               </div>
             </div>
 
@@ -247,13 +261,13 @@ export function Venues() {
             <div>
               <p className="text-sm font-normal text-primary mb-3">Amenities</p>
               <div className="flex flex-wrap gap-2">
-                {ALL_AMENITIES.map((amenity) => (
+                {ALL_AMENITIES.map(({ key, label }) => (
                   <button
-                    key={amenity}
-                    onClick={() => toggleAmenity(amenity)}
-                    className={`px-3 py-1.5 rounded-full text-xs border transition-colors cursor-pointer ${selectedAmenities.includes(amenity) ? "bg-secondary text-white border-secondary" : "border-primary/20 text-primary hover:border-secondary hover:text-secondary"}`}
+                    key={key}
+                    onClick={() => toggleAmenity(key)}
+                    className={`px-3 py-1.5 rounded-full text-xs border transition-colors cursor-pointer ${selectedAmenities.includes(key) ? "bg-secondary text-white border-secondary" : "border-primary/20 text-primary hover:border-secondary hover:text-secondary"}`}
                   >
-                    {amenity}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -273,91 +287,137 @@ export function Venues() {
       )}
 
       {/* Results count */}
-      <div className="px-6 py-3 text-xs text-primary/50">
-        {filtered.length} venue{filtered.length !== 1 ? "s" : ""} found
-      </div>
+      {!loading && !error && (
+        <div className="px-6 py-3 text-xs text-primary/50">
+          {filtered.length} venue{filtered.length !== 1 ? "s" : ""} found
+        </div>
+      )}
+
+      {/* Loading */}
+      {loading && (
+        <div className="flex items-center justify-center py-24 gap-3 text-primary/40">
+          <svg
+            className="animate-spin size-5"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"
+            />
+          </svg>
+          <span className="text-sm">Loading venues...</span>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="flex flex-col items-center justify-center py-24 gap-4 text-primary/60">
+          <p className="text-sm">{error}</p>
+          <button
+            onClick={() => setSearch(search)}
+            className="text-secondary underline text-sm cursor-pointer"
+          >
+            Try again
+          </button>
+        </div>
+      )}
 
       {/* Venues grid */}
-      <section className="px-6 pb-24">
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-4 text-primary/40">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1}
-              stroke="currentColor"
-              className="size-14"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-              />
-            </svg>
-            <p className="text-sm">No venues match your search</p>
-            <button
-              onClick={() => {
-                setSearch("");
-                clearFilters();
-              }}
-              className="text-secondary underline text-sm cursor-pointer"
-            >
-              Clear search
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filtered.map((venue) => (
-              <Link
-                key={venue.id}
-                to={`/venues/${venue.id}`}
-                className="group rounded-2xl border border-secondary overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+      {!loading && !error && (
+        <section className="px-6 pb-24">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-4 text-primary/40">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1}
+                stroke="currentColor"
+                className="size-14"
               >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={venue.image}
-                    alt={venue.name}
-                    className="w-full h-32 md:h-44 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  {/* Rating badge */}
-                  <div className="absolute top-2 right-2 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs text-secondary font-normal">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="size-3"
-                    >
-                      <path d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" />
-                    </svg>
-                    {venue.rating}
-                  </div>
-                </div>
-                <div className="p-3">
-                  <p className="font-normal text-sm text-primary truncate">
-                    {venue.name}
-                  </p>
-                  <p className="text-xs text-primary/60 mt-0.5">
-                    ${venue.price}
-                    <span className="font-thin">/night</span>
-                  </p>
-                  {/* Amenity chips (max 2) */}
-                  <div className="flex gap-1 mt-2 flex-wrap">
-                    {venue.amenities.slice(0, 2).map((a) => (
-                      <span
-                        key={a}
-                        className="text-xs bg-primary/5 text-primary/60 rounded-full px-2 py-0.5"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                />
+              </svg>
+              <p className="text-sm">No venues match your search</p>
+              <button
+                onClick={() => {
+                  setSearch("");
+                  clearFilters();
+                }}
+                className="text-secondary underline text-sm cursor-pointer"
+              >
+                Clear search
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filtered.map((venue) => (
+                <Link
+                  key={venue.id}
+                  to={`/venues/${venue.id}`}
+                  className="group rounded-2xl border border-secondary overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={venue.media[0]?.url ?? "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800"}
+                      alt={venue.media[0]?.alt ?? venue.name}
+                      className="w-full h-32 md:h-44 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {/* Rating badge */}
+                    <div className="absolute top-2 right-2 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs text-secondary font-normal">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="size-3"
                       >
-                        {a}
-                      </span>
-                    ))}
+                        <path d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" />
+                      </svg>
+                      {venue.rating.toFixed(1)}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+                  <div className="p-3">
+                    <p className="font-normal text-sm text-primary truncate">
+                      {venue.name}
+                    </p>
+                    <p className="text-xs text-primary/60 mt-0.5">
+                      ${venue.price}
+                      <span className="font-thin">/night</span>
+                    </p>
+                    {/* Amenity chips from meta */}
+                    <div className="flex gap-1 mt-2 flex-wrap">
+                      {ALL_AMENITIES.filter(({ key }) => venue.meta[key])
+                        .slice(0, 2)
+                        .map(({ key, label }) => (
+                          <span
+                            key={key}
+                            className="text-xs bg-primary/5 text-primary/60 rounded-full px-2 py-0.5"
+                          >
+                            {label}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
     </main>
   );
 }

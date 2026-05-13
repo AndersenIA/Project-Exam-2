@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+  function handleSearch(e: { preventDefault(): void }) {
     e.preventDefault();
     setIsOpen(false);
     if (search.trim()) navigate(`/venues?search=${encodeURIComponent(search.trim())}`);
@@ -43,35 +45,37 @@ export function HamburgerMenu() {
       </button>
 
       {isOpen && (
-        <ul className="absolute top-full mt-0.5 right-0 w-48 text-primary border-l-2 border-b-2 border-secondary rounded-bl-2xl shadow-lg flex flex-col justify-between min-h-70 py-2 bg-white ">
+        <ul className="absolute top-full mt-0.5 right-0 w-48 text-primary border-l-2 border-b-2 border-secondary rounded-bl-2xl shadow-lg flex flex-col justify-between min-h-70 py-2 bg-white">
           <div className="flex flex-col">
             <li>
-              <a
-                href="/home"
+              <Link
+                to="/home"
                 onClick={() => setIsOpen(false)}
                 className="block px-4 py-2 hover:text-secondary"
               >
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/venues"
+              <Link
+                to="/venues"
                 onClick={() => setIsOpen(false)}
                 className="block px-4 py-2 hover:text-secondary"
               >
                 All venues
-              </a>
+              </Link>
             </li>
-            <li>
-              <a
-                href="/bookings"
-                onClick={() => setIsOpen(false)}
-                className="block px-4 py-2 hover:text-secondary"
-              >
-                Your bookings
-              </a>
-            </li>
+            {user && (
+              <li>
+                <Link
+                  to="/bookings"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-2 hover:text-secondary"
+                >
+                  Your bookings
+                </Link>
+              </li>
+            )}
             <li className="px-4 py-2">
               <form onSubmit={handleSearch} className="flex items-center">
                 <svg
@@ -98,14 +102,40 @@ export function HamburgerMenu() {
               </form>
             </li>
           </div>
-          <li>
-            <a
-              href="/register"
-              onClick={() => setIsOpen(false)}
-              className="block px-4 py-2 text-secondary"
-            >
-              Register / Log in
-            </a>
+
+          {/* Bottom: user info or auth links */}
+          <li className="px-4 py-2">
+            {user ? (
+              <Link
+                to="/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 hover:text-secondary"
+              >
+                <img
+                  src={user.avatar?.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
+                  alt={user.avatar?.alt || user.name}
+                  className="w-7 h-7 rounded-full object-cover border border-secondary/30 shrink-0"
+                />
+                <span className="text-sm font-normal truncate">{user.name}</span>
+              </Link>
+            ) : (
+              <div className="flex flex-col gap-1">
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="text-secondary hover:underline text-sm"
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setIsOpen(false)}
+                  className="text-secondary hover:underline text-sm"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
           </li>
         </ul>
       )}

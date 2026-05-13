@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { mockVenues, mockProfile } from "../data/mockData";
+import { getVenues, type Venue } from "../api/venues";
 
 export function Home() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+
+  const [topVenues, setTopVenues] = useState<Venue[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getVenues()
+      .then((venues) => {
+        const top4 = [...venues].sort((a, b) => b.rating - a.rating).slice(0, 4);
+        setTopVenues(top4);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -24,14 +36,14 @@ export function Home() {
         <div className="w-full px-8 pb-8 md:pb-18 bg-linear-to-t from-black/80 to-transparent pt-5">
           <div className="max-w-150">
             <h1 className="text-4xl md:text-5xl text-white drop-shadow-lg pb-4">
-              Welcome {mockProfile.username}!
+              Welcome to Holidaze!
             </h1>
-            <h2 className="text-2xl md:text-3xl text-white drop-shadow-md mt-1 ">
+            <h2 className="text-2xl md:text-3xl text-white drop-shadow-md mt-1">
               Plan your next vacation
               <br /> View the{" "}
-              <a className="text-secondary md:text-5xl" href="/venues">
+              <Link className="text-secondary md:text-5xl" to="/venues">
                 venues
-              </a>
+              </Link>
             </h2>
             <div className="pt-4">
               <p className="text-white drop-shadow-md md:text-xl">
@@ -69,39 +81,70 @@ export function Home() {
         <h2 className="text-2xl text-center mb-6 text-primary">
           Popular venues
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-primary">
-          {[...mockVenues].sort((a, b) => b.rating - a.rating).slice(0, 4).map((venue) => (
-            <a
-              key={venue.id}
-              href={`/venues/${venue.id}`}
-              className="rounded-2xl border-2 border-secondary overflow-hidden shadow-md"
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12 gap-3 text-primary/40">
+            <svg
+              className="animate-spin size-5"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
             >
-              <img
-                src={venue.image}
-                alt={venue.name}
-                className="w-full h-20 md:h-40 object-cover"
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
               />
-              <div className="flex justify-between items-center px-3 py-2">
-                <div>
-                  <p className="font-normal text-sm">{venue.name}</p>
-                  <p className="text-sm font-thin">${venue.price}/night</p>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              />
+            </svg>
+            <span className="text-sm">Loading venues...</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-primary">
+            {topVenues.map((venue) => (
+              <Link
+                key={venue.id}
+                to={`/venues/${venue.id}`}
+                className="rounded-2xl border-2 border-secondary overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+              >
+                <img
+                  src={venue.media[0]?.url ?? "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800"}
+                  alt={venue.media[0]?.alt ?? venue.name}
+                  className="w-full h-20 md:h-40 object-cover"
+                />
+                <div className="flex justify-between items-center px-3 py-2">
+                  <div className="min-w-0">
+                    <p className="font-normal text-sm truncate">{venue.name}</p>
+                    <p className="text-sm font-thin">${venue.price}/night</p>
+                  </div>
+                  <div className="flex items-center gap-1 text-secondary shrink-0 ml-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="size-5"
+                    >
+                      <path d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" />
+                    </svg>
+                    <span className="text-sm">{venue.rating.toFixed(1)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-secondary">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="size-5"
-                  >
-                    <path d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" />
-                  </svg>
-                  <span className="text-sm">{venue.rating}</span>
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
-        <Link to="/venues" className="border border-secondary rounded-lg mt-4 w-fit mx-auto px-4 py-2 text-secondary hover:bg-secondary hover:text-white transition-colors">
+              </Link>
+            ))}
+          </div>
+        )}
+
+        <Link
+          to="/venues"
+          className="border border-secondary rounded-lg mt-4 w-fit mx-auto px-4 py-2 text-secondary hover:bg-secondary hover:text-white transition-colors"
+        >
           View all venues
         </Link>
       </section>
