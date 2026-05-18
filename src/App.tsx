@@ -1,5 +1,6 @@
 import "./index.css";
-import { Route, Routes, BrowserRouter, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Route, Routes, BrowserRouter, Navigate, useLocation } from "react-router-dom";
 import RegisterPage from "./pages/RegisterPage";
 import Layout from "./components/Layout";
 import { Home } from "./pages/Home";
@@ -9,10 +10,17 @@ import { Venues } from "./pages/Venues";
 import { ProfilePage } from "./pages/ProfilePage";
 import { AuthProvider } from "./context/AuthContext";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           {/* pages with layout */}
           <Route path="/" element={<Layout />}>

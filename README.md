@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+# Holidaze — Project Exam 2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern accommodation booking platform built for the Noroff Front-End Development course. Holidaze lets visitors browse venues, customers make bookings, and venue managers create and manage their own listings.
 
-Currently, two official plugins are available:
+## Links
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Resource                      | URL                        |
+| ----------------------------- | -------------------------- |
+| Live site                     | _Netlify/Vercel URL here_  |
+| GitHub repository             | _GitHub repo URL here_     |
+| Figma style guide & prototype | _Figma URL here_           |
+| Kanban board                  | _GitHub Projects URL here_ |
 
-## React Compiler
+## Built with
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/) — build tool and dev server
+- [Tailwind CSS v4](https://tailwindcss.com/) — styling
+- [React Router v7](https://reactrouter.com/) — client-side routing
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**All users**
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Browse all venues with search and sort
+- View individual venue pages with image carousel, amenities, and availability calendar
+- Register as a customer or venue manager (requires a `stud.noroff.no` email)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**Customers**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Log in and out
+- Book a venue by selecting dates and number of guests
+- View upcoming bookings with a personal booking calendar on the profile page
+- Update profile picture
+
+**Venue managers**
+
+- Create, edit, and delete venues (including multiple images)
+- View upcoming bookings for each managed venue
+- Switch between customer and venue manager roles
+- Update profile picture
+
+## Getting started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v18 or higher
+- npm (included with Node.js)
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone <your-github-repo-url>
+   cd Project-Exam-2
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file in the root of the project:
+
+   ```
+   VITE_API_BASE_URL=https://v2.api.noroff.dev
+   VITE_API_KEY=your_noroff_api_key_here
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   The app will be running at `http://localhost:5173`.
+
+### Other commands
+
+```bash
+npm run build      # Production build
+npm run preview    # Preview the production build locally
+npm run lint       # Run ESLint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Environment variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Variable            | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| `VITE_API_BASE_URL` | Base URL for the Noroff API (`https://v2.api.noroff.dev`) |
+| `VITE_API_KEY`      | Your personal Noroff API key                              |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+> **Note:** Never commit your `.env` file to version control. It is already listed in `.gitignore`.

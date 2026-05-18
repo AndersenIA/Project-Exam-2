@@ -25,6 +25,17 @@ export interface BookingResult {
   updated: string;
 }
 
+export async function deleteBooking(id: string, token: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/holidaze/bookings/${id}`, {
+    method: "DELETE",
+    headers: headers(token),
+  });
+  if (!res.ok) {
+    const json = await res.json();
+    throw new Error(json.errors?.[0]?.message ?? "Failed to cancel booking");
+  }
+}
+
 export async function createBooking(
   token: string,
   payload: BookingPayload,

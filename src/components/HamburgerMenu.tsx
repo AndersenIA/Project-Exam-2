@@ -68,7 +68,7 @@ export function HamburgerMenu() {
             {user && (
               <li>
                 <Link
-                  to="/bookings"
+                  to="/profile?tab=bookings"
                   onClick={() => setIsOpen(false)}
                   className="block px-4 py-2 hover:text-secondary"
                 >

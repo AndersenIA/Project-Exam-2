@@ -123,5 +123,5 @@ export interface VenueFormData {
   maxGuests: number;
   media?: { url: string; alt: string }[];
   meta?: { wifi: boolean; parking: boolean; breakfast: boolean; pets: boolean };
-  location?: { address?: string; city?: string; country?: string };
+  location?: { address?: string | null; city?: string | null; country?: string | null };
 }
