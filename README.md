@@ -4,12 +4,12 @@ A modern accommodation booking platform built for the Noroff Front-End Developme
 
 ## Links
 
-| Resource                      | URL                        |
-| ----------------------------- | -------------------------- |
-| Live site                     | _Netlify/Vercel URL here_  |
-| GitHub repository             | _GitHub repo URL here_     |
-| Figma style guide & prototype | _Figma URL here_           |
-| Kanban board                  | _GitHub Projects URL here_ |
+| Resource                      | URL                                              |
+| ----------------------------- | ------------------------------------------------ |
+| Live site                     | _https://andersenpe2.netlify.app/home_           |
+| GitHub repository             | _https://github.com/AndersenIA/Project-Exam-2_   |
+| Figma style guide & prototype | _Figma URL here_                                 |
+| Kanban board                  | _https://github.com/users/AndersenIA/projects/6_ |
 
 ## Built with
 
