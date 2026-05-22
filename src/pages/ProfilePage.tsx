@@ -154,7 +154,7 @@ function MyBookingsCalendar({ bookings }: { bookings: Booking[] }) {
             cls += "bg-secondary text-white rounded-full font-normal";
           else if (isBooked) cls += "bg-secondary/20 text-primary rounded-none";
           else if (isToday)
-            cls += "border border-secondary text-secondary rounded-full";
+            cls += "ring-2 ring-secondary text-secondary font-normal rounded-full";
           else cls += "text-primary/70 rounded-full";
           return (
             <div

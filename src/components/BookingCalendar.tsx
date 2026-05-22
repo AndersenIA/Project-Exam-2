@@ -130,7 +130,7 @@ export function BookingCalendar({
     if (isBooked) return base + "bg-red-50 text-red-300 cursor-not-allowed line-through";
     if (isCheckIn || isCheckOut) return base + "bg-secondary text-white font-normal cursor-pointer";
     if (isInRange || isHoverRange) return base + "bg-secondary/20 text-primary rounded-none cursor-pointer";
-    if (isToday) return base + "border border-secondary text-secondary cursor-pointer";
+    if (isToday) return base + "ring-2 ring-secondary text-secondary font-normal cursor-pointer";
     return base + "text-primary hover:bg-secondary/10 cursor-pointer";
   }
 
