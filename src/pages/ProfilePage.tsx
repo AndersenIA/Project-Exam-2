@@ -19,8 +19,18 @@ import type { Venue } from "../api/venues";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function getDaysInMonth(year: number, month: number) {
@@ -47,21 +57,29 @@ function MyBookingsCalendar({ bookings }: { bookings: Booking[] }) {
     const date = new Date(viewYear, viewMonth, day);
     date.setHours(0, 0, 0, 0);
     const isToday = date.getTime() === today.getTime();
-    const match = ranges.find(
-      (r) => date >= r.from && date <= r.to,
-    );
+    const match = ranges.find((r) => date >= r.from && date <= r.to);
     const isStart = ranges.some((r) => date.getTime() === r.from.getTime());
     const isEnd = ranges.some((r) => date.getTime() === r.to.getTime());
-    return { isBooked: !!match, isStart, isEnd, isToday, venueName: match?.venueName ?? "" };
+    return {
+      isBooked: !!match,
+      isStart,
+      isEnd,
+      isToday,
+      venueName: match?.venueName ?? "",
+    };
   }
 
   function prevMonth() {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear((y) => y - 1); }
-    else setViewMonth((m) => m - 1);
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear((y) => y - 1);
+    } else setViewMonth((m) => m - 1);
   }
   function nextMonth() {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear((y) => y + 1); }
-    else setViewMonth((m) => m + 1);
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear((y) => y + 1);
+    } else setViewMonth((m) => m + 1);
   }
 
   const daysInMonth = getDaysInMonth(viewYear, viewMonth);
@@ -70,35 +88,80 @@ function MyBookingsCalendar({ bookings }: { bookings: Booking[] }) {
   return (
     <div className="border border-primary/20 rounded-2xl p-4 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-secondary/10 text-primary transition-colors cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        <button
+          onClick={prevMonth}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-secondary/10 text-primary transition-colors cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="size-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 19.5 8.25 12l7.5-7.5"
+            />
           </svg>
         </button>
-        <span className="font-normal text-primary text-sm">{MONTHS[viewMonth]} {viewYear}</span>
-        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-secondary/10 text-primary transition-colors cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        <span className="font-normal text-primary text-sm">
+          {MONTHS[viewMonth]} {viewYear}
+        </span>
+        <button
+          onClick={nextMonth}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-secondary/10 text-primary transition-colors cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="size-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+            />
           </svg>
         </button>
       </div>
       <div className="grid grid-cols-7 mb-2">
         {DAYS.map((d) => (
-          <div key={d} className="text-center text-xs text-primary/50 font-normal pb-1">{d}</div>
+          <div
+            key={d}
+            className="text-center text-xs text-primary/50 font-normal pb-1"
+          >
+            {d}
+          </div>
         ))}
       </div>
       <div className="grid grid-cols-7 gap-y-1">
-        {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} />)}
+        {Array.from({ length: firstDay }).map((_, i) => (
+          <div key={`e-${i}`} />
+        ))}
         {Array.from({ length: daysInMonth }).map((_, i) => {
           const day = i + 1;
-          const { isBooked, isStart, isEnd, isToday, venueName } = getDayState(day);
-          let cls = "w-9 h-9 flex items-center justify-center text-sm font-thin select-none transition-all ";
-          if (isStart || isEnd) cls += "bg-secondary text-white rounded-full font-normal";
+          const { isBooked, isStart, isEnd, isToday, venueName } =
+            getDayState(day);
+          let cls =
+            "w-9 h-9 flex items-center justify-center text-sm font-thin select-none transition-all ";
+          if (isStart || isEnd)
+            cls += "bg-secondary text-white rounded-full font-normal";
           else if (isBooked) cls += "bg-secondary/20 text-primary rounded-none";
-          else if (isToday) cls += "border border-secondary text-secondary rounded-full";
+          else if (isToday)
+            cls += "border border-secondary text-secondary rounded-full";
           else cls += "text-primary/70 rounded-full";
           return (
-            <div key={day} className="flex justify-center" title={isBooked ? venueName : undefined}>
+            <div
+              key={day}
+              className="flex justify-center"
+              title={isBooked ? venueName : undefined}
+            >
               <div className={cls}>{day}</div>
             </div>
           );
@@ -209,7 +272,9 @@ function VenueForm({
             type="number"
             min={0}
             value={form.price === 0 ? "" : form.price}
-            onChange={(e) => set("price", e.target.value === "" ? 0 : Number(e.target.value))}
+            onChange={(e) =>
+              set("price", e.target.value === "" ? 0 : Number(e.target.value))
+            }
             placeholder="0"
             required
           />
@@ -221,7 +286,12 @@ function VenueForm({
             type="number"
             min={1}
             value={form.maxGuests === 0 ? "" : form.maxGuests}
-            onChange={(e) => set("maxGuests", e.target.value === "" ? 0 : Number(e.target.value))}
+            onChange={(e) =>
+              set(
+                "maxGuests",
+                e.target.value === "" ? 0 : Number(e.target.value),
+              )
+            }
             placeholder="1"
             required
           />
@@ -238,7 +308,10 @@ function VenueForm({
               value={img.url}
               onChange={(e) => {
                 const updated = [...(form.media ?? [])];
-                updated[i] = { url: e.target.value, alt: form.name || "Venue image" };
+                updated[i] = {
+                  url: e.target.value,
+                  alt: form.name || "Venue image",
+                };
                 set("media", updated);
               }}
               placeholder="https://example.com/image.jpg"
@@ -246,12 +319,28 @@ function VenueForm({
             {(form.media ?? []).length > 1 && (
               <button
                 type="button"
-                onClick={() => set("media", (form.media ?? []).filter((_, idx) => idx !== i))}
+                onClick={() =>
+                  set(
+                    "media",
+                    (form.media ?? []).filter((_, idx) => idx !== i),
+                  )
+                }
                 className="text-primary/40 hover:text-red-400 transition-colors shrink-0"
                 aria-label="Remove image"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="size-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             )}
@@ -260,11 +349,24 @@ function VenueForm({
         {(form.media ?? []).length < 8 && (
           <button
             type="button"
-            onClick={() => set("media", [...(form.media ?? []), { url: "", alt: "" }])}
+            onClick={() =>
+              set("media", [...(form.media ?? []), { url: "", alt: "" }])
+            }
             className="flex items-center gap-1.5 text-xs text-secondary hover:text-secondary/80 transition-colors w-fit"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-3.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="size-3.5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
             </svg>
             Add image
           </button>
@@ -368,6 +470,9 @@ export function ProfilePage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
+  const [deleteVenueConfirmId, setDeleteVenueConfirmId] = useState<
+    string | null
+  >(null);
 
   function requestCancelBooking(id: string, dateFrom: string) {
     const checkIn = new Date(dateFrom);
@@ -460,8 +565,6 @@ export function ProfilePage() {
   }
 
   // ── Delete venue ──
-  const [deleteVenueConfirmId, setDeleteVenueConfirmId] = useState<string | null>(null);
-
   async function confirmDeleteVenue() {
     if (!deleteVenueConfirmId) return;
     const id = deleteVenueConfirmId;
@@ -743,7 +846,10 @@ export function ProfilePage() {
                     className="border border-primary/10 rounded-2xl overflow-hidden"
                   >
                     <div className="flex gap-4">
-                      <Link to={`/venues/${venue.id}`} className="shrink-0 w-24 self-stretch overflow-hidden">
+                      <Link
+                        to={`/venues/${venue.id}`}
+                        className="shrink-0 w-24 self-stretch overflow-hidden"
+                      >
                         <img
                           src={
                             venue.media[0]?.url ??
@@ -867,63 +973,87 @@ export function ProfilePage() {
               </div>
             ) : (
               <>
-              <p className="text-xs text-primary/40 -mt-2 mb-2">
-                Free cancellation up to 2 days before check-in.
-              </p>
-              <div className="flex flex-col gap-4">
-                {upcomingBookings.map((booking) => {
-                  const checkIn = new Date(booking.dateFrom);
-                  const twoDaysFromNow = new Date();
-                  twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
-                  twoDaysFromNow.setHours(0, 0, 0, 0);
-                  const canCancel = checkIn >= twoDaysFromNow;
-                  return (
-                    <div
-                      key={booking.id}
-                      className="border border-primary/10 rounded-2xl overflow-hidden flex gap-4"
-                    >
-                      {booking.venue && (
-                        <Link to={`/venues/${booking.venue.id}`} className="shrink-0 w-24 self-stretch overflow-hidden">
-                          <img
-                            src={
-                              booking.venue.media[0]?.url ??
-                              "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400"
-                            }
-                            alt={booking.venue.name}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          />
-                        </Link>
-                      )}
-                      <div className="py-3 pr-3 flex flex-col justify-center gap-1 flex-1">
+                <p className="text-xs text-primary/40 -mt-2 mb-2">
+                  Free cancellation up to 2 days before check-in.
+                </p>
+                <div className="flex flex-col gap-4">
+                  {upcomingBookings.map((booking) => {
+                    const checkIn = new Date(booking.dateFrom);
+                    const twoDaysFromNow = new Date();
+                    twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
+                    twoDaysFromNow.setHours(0, 0, 0, 0);
+                    const canCancel = checkIn >= twoDaysFromNow;
+                    return (
+                      <div
+                        key={booking.id}
+                        className="border border-primary/10 rounded-2xl overflow-hidden flex gap-4"
+                      >
                         {booking.venue && (
                           <Link
                             to={`/venues/${booking.venue.id}`}
-                            className="font-normal text-primary hover:text-secondary text-sm"
+                            className="shrink-0 w-24 self-stretch overflow-hidden"
                           >
-                            {booking.venue.name}
+                            <img
+                              src={
+                                booking.venue.media[0]?.url ??
+                                "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400"
+                              }
+                              alt={booking.venue.name}
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            />
                           </Link>
                         )}
-                        <p className="text-xs text-primary/60">
-                          {new Date(booking.dateFrom).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
-                          {" – "}
-                          {new Date(booking.dateTo).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                        </p>
-                        <p className="text-xs text-primary/50">
-                          {booking.guests} guest{booking.guests > 1 ? "s" : ""}
-                        </p>
-                        <button
-                          onClick={() => requestCancelBooking(booking.id, booking.dateFrom)}
-                          disabled={!canCancel || cancellingId === booking.id}
-                          className="mt-1 text-xs w-fit text-red-400 hover:text-red-500 disabled:text-primary/20 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                          title={!canCancel ? "Cannot cancel within 2 days of check-in" : undefined}
-                        >
-                          {cancellingId === booking.id ? "Cancelling..." : canCancel ? "Cancel booking" : "Non-refundable"}
-                        </button>
+                        <div className="py-3 pr-3 flex flex-col justify-center gap-1 flex-1">
+                          {booking.venue && (
+                            <Link
+                              to={`/venues/${booking.venue.id}`}
+                              className="font-normal text-primary hover:text-secondary text-sm"
+                            >
+                              {booking.venue.name}
+                            </Link>
+                          )}
+                          <p className="text-xs text-primary/60">
+                            {new Date(booking.dateFrom).toLocaleDateString(
+                              "en-GB",
+                              { day: "numeric", month: "short" },
+                            )}
+                            {" – "}
+                            {new Date(booking.dateTo).toLocaleDateString(
+                              "en-GB",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )}
+                          </p>
+                          <p className="text-xs text-primary/50">
+                            {booking.guests} guest
+                            {booking.guests > 1 ? "s" : ""}
+                          </p>
+                          <button
+                            onClick={() =>
+                              requestCancelBooking(booking.id, booking.dateFrom)
+                            }
+                            disabled={!canCancel || cancellingId === booking.id}
+                            className="mt-1 text-xs w-fit text-red-400 hover:text-red-500 disabled:text-primary/20 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            title={
+                              !canCancel
+                                ? "Cannot cancel within 2 days of check-in"
+                                : undefined
+                            }
+                          >
+                            {cancellingId === booking.id
+                              ? "Cancelling..."
+                              : canCancel
+                                ? "Cancel booking"
+                                : "Non-refundable"}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
               </>
             )}
           </>
