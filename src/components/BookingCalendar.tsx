@@ -10,13 +10,29 @@ interface BookingCalendarProps {
   maxGuests: number;
   bookedRanges?: BookedRange[];
   loading?: boolean;
-  onBook: (checkIn: Date, checkOut: Date, nights: number, total: number, guests: number) => void;
+  onBook: (
+    checkIn: Date,
+    checkOut: Date,
+    nights: number,
+    total: number,
+    guests: number,
+  ) => void;
 }
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function getDaysInMonth(year: number, month: number) {
@@ -47,8 +63,12 @@ function isDayBooked(date: Date, ranges: BookedRange[]): boolean {
   return ranges.some((r) => d >= r.from.getTime() && d < r.to.getTime());
 }
 
-// Check if a proposed range [from, to] overlaps any booked range
-function rangeOverlapsBooking(from: Date, to: Date, ranges: BookedRange[]): boolean {
+// Check if a proposedf range [from, to] overlaps any booked range
+function rangeOverlapsBooking(
+  from: Date,
+  to: Date,
+  ranges: BookedRange[],
+): boolean {
   return ranges.some((r) => from < r.to && r.from < to);
 }
 
@@ -74,13 +94,17 @@ export function BookingCalendar({
   const firstDay = getFirstDayOfMonth(viewYear, viewMonth);
 
   function prevMonth() {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear((y) => y - 1); }
-    else setViewMonth((m) => m - 1);
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear((y) => y - 1);
+    } else setViewMonth((m) => m - 1);
   }
 
   function nextMonth() {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear((y) => y + 1); }
-    else setViewMonth((m) => m + 1);
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear((y) => y + 1);
+    } else setViewMonth((m) => m + 1);
   }
 
   function handleDayClick(day: number) {
@@ -120,28 +144,45 @@ export function BookingCalendar({
     const isCheckOut = checkOut && isSameDay(date, checkOut);
     const isInRange = checkIn && checkOut && isBetween(date, checkIn, checkOut);
     const isHoverRange =
-      checkIn && !checkOut && hovered && hovered > checkIn &&
-      isBetween(date, checkIn, hovered) && !isDayBooked(date, bookedRanges);
+      checkIn &&
+      !checkOut &&
+      hovered &&
+      hovered > checkIn &&
+      isBetween(date, checkIn, hovered) &&
+      !isDayBooked(date, bookedRanges);
     const isToday = isSameDay(date, today);
 
-    const base = "w-9 h-9 flex items-center justify-center rounded-full text-sm font-thin transition-all select-none ";
+    const base =
+      "w-9 h-9 flex items-center justify-center rounded-full text-sm font-thin transition-all select-none ";
 
     if (isPast) return base + "text-gray-300 cursor-not-allowed";
-    if (isBooked) return base + "bg-red-50 text-red-300 cursor-not-allowed line-through";
-    if (isCheckIn || isCheckOut) return base + "bg-secondary text-white font-normal cursor-pointer";
-    if (isInRange || isHoverRange) return base + "bg-secondary/20 text-primary rounded-none cursor-pointer";
-    if (isToday) return base + "ring-2 ring-secondary text-secondary font-normal cursor-pointer";
+    if (isBooked)
+      return base + "bg-red-50 text-red-300 cursor-not-allowed line-through";
+    if (isCheckIn || isCheckOut)
+      return base + "bg-secondary text-white font-normal cursor-pointer";
+    if (isInRange || isHoverRange)
+      return base + "bg-secondary/20 text-primary rounded-none cursor-pointer";
+    if (isToday)
+      return (
+        base + "ring-2 ring-secondary text-secondary font-normal cursor-pointer"
+      );
     return base + "text-primary hover:bg-secondary/10 cursor-pointer";
   }
 
   const nights =
     checkIn && checkOut
-      ? Math.round((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
+      ? Math.round(
+          (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24),
+        )
       : 0;
   const total = nights * pricePerNight;
 
   function formatDate(d: Date) {
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   }
 
   return (
@@ -168,8 +209,19 @@ export function BookingCalendar({
             onClick={prevMonth}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-secondary/10 text-primary transition-colors cursor-pointer"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="size-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              />
             </svg>
           </button>
           <span className="font-normal text-primary text-sm">
@@ -179,8 +231,19 @@ export function BookingCalendar({
             onClick={nextMonth}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-secondary/10 text-primary transition-colors cursor-pointer"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="size-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              />
             </svg>
           </button>
         </div>
@@ -188,7 +251,12 @@ export function BookingCalendar({
         {/* Day headers */}
         <div className="grid grid-cols-7 mb-2">
           {DAYS.map((d) => (
-            <div key={d} className="text-center text-xs text-primary/50 font-normal pb-1">{d}</div>
+            <div
+              key={d}
+              className="text-center text-xs text-primary/50 font-normal pb-1"
+            >
+              {d}
+            </div>
           ))}
         </div>
 
@@ -221,7 +289,8 @@ export function BookingCalendar({
       {/* Overlap error */}
       {overlapError && (
         <p className="text-xs text-red-500 text-center">
-          That range includes already booked dates — please choose different dates.
+          That range includes already booked dates — please choose different
+          dates.
         </p>
       )}
 
@@ -252,17 +321,37 @@ export function BookingCalendar({
             onClick={() => setGuests((g) => Math.max(1, g - 1))}
             className="w-8 h-8 rounded-full border border-primary/20 flex items-center justify-center text-primary hover:border-secondary hover:text-secondary transition-colors cursor-pointer"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="size-4"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
             </svg>
           </button>
-          <span className="text-sm font-normal text-primary w-4 text-center">{guests}</span>
+          <span className="text-sm font-normal text-primary w-4 text-center">
+            {guests}
+          </span>
           <button
             onClick={() => setGuests((g) => Math.min(maxGuests, g + 1))}
             className="w-8 h-8 rounded-full border border-primary/20 flex items-center justify-center text-primary hover:border-secondary hover:text-secondary transition-colors cursor-pointer"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="size-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
             </svg>
           </button>
         </div>
@@ -275,10 +364,23 @@ export function BookingCalendar({
             <p className="text-xs text-primary/60 font-thin">
               ${pricePerNight}/night × {nights} night{nights > 1 ? "s" : ""}
             </p>
-            <p className="text-lg font-normal text-primary mt-1">Total: ${total}</p>
+            <p className="text-lg font-normal text-primary mt-1">
+              Total: ${total}
+            </p>
           </div>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 text-secondary">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-8 text-secondary"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+            />
           </svg>
         </div>
       )}
@@ -287,7 +389,8 @@ export function BookingCalendar({
       <button
         disabled={!checkIn || !checkOut || loading}
         onClick={() => {
-          if (checkIn && checkOut) onBook(checkIn, checkOut, nights, total, guests);
+          if (checkIn && checkOut)
+            onBook(checkIn, checkOut, nights, total, guests);
         }}
         className="w-full py-3 rounded-full bg-secondary text-white font-normal text-base tracking-wide transition-all hover:bg-secondary/90 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
       >
